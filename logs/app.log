@@ -1,0 +1,54 @@
+{"lvl":"ERROR","time":"2025-11-07T18:20:46+03:00","msg":"Ignored key without a value.","ignored":null}
+{"lvl":"INFO","time":"2025-11-07T18:20:46+03:00","msg":"info"}
+{"lvl":"ERROR","time":"2025-11-07T18:20:46+03:00","msg":"Ignored key without a value.","ignored":null}
+{"lvl":"WARN","time":"2025-11-07T18:20:46+03:00","msg":"warn"}
+{"lvl":"ERROR","time":"2025-11-07T18:20:46+03:00","msg":"Ignored key without a value.","ignored":["s",1234]}
+{"lvl":"ERROR","time":"2025-11-07T18:20:46+03:00","msg":"error"}
+{"lvl":"ERROR","time":"2025-11-07T18:20:46+03:00","msg":"Ignored key without a value.","ignored":null}
+{"lvl":"FATAL","time":"2025-11-07T18:20:46+03:00","msg":"fatal"}
+{"lvl":"ERROR","time":"2025-11-07T18:35:17+03:00","msg":"Ignored key without a value.","ignored":null}
+{"lvl":"INFO","time":"2025-11-07T18:35:17+03:00","msg":"info"}
+{"lvl":"ERROR","time":"2025-11-07T18:35:17+03:00","msg":"Ignored key without a value.","ignored":null}
+{"lvl":"WARN","time":"2025-11-07T18:35:17+03:00","msg":"warn"}
+{"lvl":"ERROR","time":"2025-11-07T18:35:17+03:00","msg":"error\n"}
+{"lvl":"ERROR","time":"2025-11-07T18:35:17+03:00","msg":"fatal\n"}
+{"lvl":"ERROR","time":"2025-11-07T18:36:13+03:00","msg":"Ignored key without a value.","ignored":null}
+{"lvl":"INFO","time":"2025-11-07T18:36:13+03:00","msg":"info"}
+{"lvl":"ERROR","time":"2025-11-07T18:36:13+03:00","msg":"Ignored key without a value.","ignored":null}
+{"lvl":"WARN","time":"2025-11-07T18:36:13+03:00","msg":"warn"}
+{"lvl":"ERROR","time":"2025-11-07T18:36:13+03:00","msg":"error"}
+{"lvl":"ERROR","time":"2025-11-07T18:36:13+03:00","msg":"fatal"}
+{"lvl":"ERROR","time":"2025-11-07T18:38:28+03:00","msg":"error"}
+{"lvl":"ERROR","time":"2025-11-07T18:38:28+03:00","msg":"fatal"}
+{"lvl":"ERROR","time":"2025-11-07T18:38:39+03:00","msg":"Ignored key without a value.","ignored":null}
+{"lvl":"WARN","time":"2025-11-07T18:38:39+03:00","msg":"warn"}
+{"lvl":"ERROR","time":"2025-11-07T18:38:39+03:00","msg":"error"}
+{"lvl":"ERROR","time":"2025-11-07T18:38:39+03:00","msg":"fatal"}
+{"lvl":"ERROR","time":"2025-11-07T18:39:23+03:00","msg":"Ignored key without a value.","ignored":["dddd",123]}
+{"lvl":"WARN","time":"2025-11-07T18:39:23+03:00","msg":"warn"}
+{"lvl":"ERROR","time":"2025-11-07T18:39:23+03:00","msg":"error"}
+{"lvl":"ERROR","time":"2025-11-07T18:39:23+03:00","msg":"fatal"}
+{"lvl":"ERROR","time":"2025-11-07T18:40:46+03:00","msg":"Ignored key without a value.","ignored":[{"dddd":123}]}
+{"lvl":"WARN","time":"2025-11-07T18:40:46+03:00","msg":"warn"}
+{"lvl":"ERROR","time":"2025-11-07T18:40:46+03:00","msg":"error"}
+{"lvl":"ERROR","time":"2025-11-07T18:40:46+03:00","msg":"fatal"}
+{"lvl":"ERROR","time":"2025-11-07T18:43:55+03:00","msg":"Ignored key without a value.","ignored":[{"dddd":123}]}
+{"lvl":"WARN","time":"2025-11-07T18:43:55+03:00","msg":"warn"}
+{"lvl":"ERROR","time":"2025-11-07T18:43:55+03:00","msg":"error"}
+{"lvl":"ERROR","time":"2025-11-07T18:43:55+03:00","msg":"fatal"}
+{"lvl":"ERROR","time":"2025-11-07T18:45:33+03:00","msg":"Ignored key without a value.","ignored":[["username","DIMA","id",1234]]}
+{"lvl":"WARN","time":"2025-11-07T18:45:33+03:00","msg":"warn"}
+{"lvl":"ERROR","time":"2025-11-07T18:45:33+03:00","msg":"error"}
+{"lvl":"ERROR","time":"2025-11-07T18:45:33+03:00","msg":"fatal"}
+{"lvl":"ERROR","time":"2025-11-07T18:47:34+03:00","msg":"Ignored key without a value.","ignored":[["username","DIMA","id",1234]]}
+{"lvl":"WARN","time":"2025-11-07T18:47:34+03:00","msg":"warn"}
+{"lvl":"ERROR","time":"2025-11-07T18:47:34+03:00","msg":"error"}
+{"lvl":"FATAL","time":"2025-11-07T18:47:34+03:00","msg":"fatal"}
+{"lvl":"ERROR","time":"2025-11-07T18:47:47+03:00","msg":"Ignored key without a value.","ignored":null}
+{"lvl":"WARN","time":"2025-11-07T18:47:47+03:00","msg":"warn"}
+{"lvl":"ERROR","time":"2025-11-07T18:47:47+03:00","msg":"error"}
+{"lvl":"FATAL","time":"2025-11-07T18:47:47+03:00","msg":"fatal"}
+{"lvl":"ERROR","time":"2025-11-07T18:50:27+03:00","msg":"error: [Err one Err two]"}
+{"lvl":"FATAL","time":"2025-11-07T18:50:27+03:00","msg":"fatal: [Fatal one Fatal two]"}
+{"lvl":"ERROR","time":"2025-11-07T18:51:52+03:00","msg":"error: Err one"}
+{"lvl":"FATAL","time":"2025-11-07T18:51:52+03:00","msg":"fatal: Fatal one"}

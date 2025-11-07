@@ -1,14 +1,32 @@
 package main
 
 import (
-	"fmt"
-	"mealmate/internal/server"
-	"os"
+	"mealmate/cmd/config"
+	"mealmate/cmd/server"
+	"mealmate/internal/logg"
+	"mealmate/internal/store"
 )
 
+var LEVEL = "INFO"
+
 func main() {
-	if err := server.Run(); err != nil {
-		fmt.Fprintf(os.Stdout, "%v\n", err)
-		os.Exit(1)
-	}
+	// Base Logger
+	appLog := logg.NewLogg("app.log", LEVEL)
+
+	// Config
+	config := config.NewArgsENV(appLog)
+
+	// Extra loggers
+	bsnessLog := logg.NewLogg(config.GetBsnessLog(), LEVEL)
+	infraLog := logg.NewLogg(config.GetInfraLog(), LEVEL)
+
+	// Database
+	storeDB := store.NewStoreDB(config, infraLog)
+
+	// Defer
+	defer bsnessLog.Close()
+	defer infraLog.Close()
+	defer appLog.Close()
+
+	server.Start(config, appLog, infraLog, bsnessLog, storeDB)
 }
