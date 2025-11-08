@@ -1,6 +1,7 @@
 package server
 
 import (
+	mv "mealmate/internal/middleware"
 	"mealmate/internal/routes"
 
 	"github.com/go-chi/chi"
@@ -18,8 +19,9 @@ func NewRouter(authRouter routes.Register) *Route {
 	}
 }
 
-func (r *Route) Run() *chi.Mux {
+func (r *Route) Run(mdlwere mv.Middleware) *chi.Mux {
 	// Middleware
+	r.R.Use(mdlwere.WithLogger, mdlwere.WithAuth)
 
 	// Api
 	r.R.Route("/", func(route chi.Router) {

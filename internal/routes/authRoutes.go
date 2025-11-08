@@ -18,5 +18,5 @@ func (a *AuthRoutes) RegisterRoutes(route chi.Router) {
 	route.Post("/reset-password", a.AuthHandler.ResetPass) // Восстановление пароля
 	route.Post("/register", a.AuthHandler.Register)        // Регистрация
 	route.Post("/logout", a.AuthHandler.Logout)            // Выход
-	route.Post("/login", a.AuthHandler.Login)              // Авторизация
+	route.Post("/login", a.AuthHandler.Login)              // Вход
 }

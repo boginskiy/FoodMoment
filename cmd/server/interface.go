@@ -1,7 +1,11 @@
 package server
 
-import "github.com/go-chi/chi"
+import (
+	mv "mealmate/internal/middleware"
+
+	"github.com/go-chi/chi"
+)
 
 type Router interface {
-	Run() *chi.Mux
+	Run(mdlwere mv.Middleware) *chi.Mux
 }

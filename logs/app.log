@@ -52,3 +52,17 @@
 {"lvl":"FATAL","time":"2025-11-07T18:50:27+03:00","msg":"fatal: [Fatal one Fatal two]"}
 {"lvl":"ERROR","time":"2025-11-07T18:51:52+03:00","msg":"error: Err one"}
 {"lvl":"FATAL","time":"2025-11-07T18:51:52+03:00","msg":"fatal: Fatal one"}
+{"lvl":"INFO","time":"2025-11-08T19:05:43+03:00","msg":"Mdlware: map[duration:142.888µs method:POST uri:/api/v1/auth/register]"}
+{"lvl":"INFO","time":"2025-11-08T19:08:34+03:00","msg":"Mdlware: map[duration:74.069µs method:POST uri:/api/v1/auth/login]"}
+{"lvl":"INFO","time":"2025-11-08T19:11:05+03:00","msg":"Mdlware: map[duration:289.693µs method:POST uri:/api/v1/auth/login]"}
+{"lvl":"INFO","time":"2025-11-08T19:14:01+03:00","msg":"Mdlware: map[duration:26.19µs method:POST uri:/api/v1/auth/login]"}
+{"lvl":"INFO","time":"2025-11-08T19:14:16+03:00","msg":"Mdlware: map[duration:322.947µs method:POST uri:/api/v1/auth/login]"}
+{"lvl":"INFO","time":"2025-11-08T19:14:49+03:00","msg":"Mdlware: map[duration:33.211µs method:POST uri:/api/v1/auth/login]"}
+{"lvl":"INFO","time":"2025-11-08T19:17:51+03:00","msg":"Mdlware: map[duration:77.252µs method:POST uri:/api/v1/auth/login]"}
+{"lvl":"INFO","time":"2025-11-08T19:24:10+03:00","msg":"Mdlware>"}
+{"lvl":"INFO","time":"2025-11-08T19:25:48+03:00","msg":"Mdlware>"}
+{"lvl":"INFO","time":"2025-11-08T19:27:57+03:00","msg":"[uri /api/v1/auth/login method POST duration 39.063µs]"}
+{"lvl":"INFO","time":"2025-11-08T19:28:32+03:00","msg":"Mdlware [uri /api/v1/auth/login method POST duration 45.785µs]"}
+{"lvl":"INFO","time":"2025-11-08T19:31:02+03:00","msg":"Mdlware: [uri /api/v1/auth/login method POST duration 37.11µs]"}
+{"lvl":"ERROR","time":"2025-11-08T19:31:56+03:00","msg":"Ignored key without a value.","ignored":["uri","/api/v1/auth/login","method","POST","duration",34032]}
+{"lvl":"INFO","time":"2025-11-08T19:31:56+03:00","msg":"Mdlware:"}

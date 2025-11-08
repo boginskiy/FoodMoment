@@ -50,25 +50,25 @@ func (l *Logg) disassemblyAny(keysAndValues ...any) string {
 	}
 	var buf bytes.Buffer
 	for i := 0; i < len(keysAndValues); {
-		buf.WriteString(fmt.Sprintf("%v: %v, ", keysAndValues[i], keysAndValues[i+1]))
+		buf.WriteString(fmt.Sprintf(" %v:%v", keysAndValues[i], keysAndValues[i+1]))
 		i += 2
 	}
 	return buf.String()
 }
 
-func (l *Logg) RaiseInfo(msg string, something any) {
-	l.zap.Infof("%s: %+v", msg, something)
+func (l *Logg) RaiseInfo(msg string, keysAndValues ...any) {
+	l.zap.Infoln(msg, keysAndValues)
 }
 
-func (l *Logg) RaiseWarning(msg string, something any) {
-	l.zap.Warnf("%s: %+v", msg, something)
+func (l *Logg) RaiseWarning(msg string, keysAndValues ...any) {
+	l.zap.Warnln(msg, keysAndValues)
 }
 
 func (l *Logg) RaiseError(msg string, err error) {
 	if err == nil {
 		l.zap.Errorf("%s", msg)
 	} else {
-		l.zap.Errorf("%s: %s", msg, err.Error())
+		l.zap.Errorf("%s> %s", msg, err.Error())
 	}
 }
 
@@ -76,6 +76,6 @@ func (l *Logg) RaiseFatal(msg string, err error) {
 	if err == nil {
 		l.zap.Fatalf("%s", msg)
 	} else {
-		l.zap.Fatalf("%s: %s", msg, err.Error())
+		l.zap.Fatalf("%s> %s", msg, err.Error())
 	}
 }
