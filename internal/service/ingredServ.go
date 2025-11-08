@@ -2,9 +2,7 @@ package service
 
 import (
 	"bytes"
-	"encoding/json"
 	"io"
-	m "mealmate/internal/model"
 	"net/http"
 )
 
@@ -30,7 +28,7 @@ func (i *IngredServ) Read(req *http.Request) ([]byte, int) {
 
 func (i *IngredServ) Create(req *http.Request) ([]byte, int) {
 	// Считать тело запроса
-	newIngred := m.NewIngredModel()
+	// newIngred := m.NewIngredModel()
 
 	// Буфер
 	var tmpBody bytes.Buffer
@@ -39,7 +37,7 @@ func (i *IngredServ) Create(req *http.Request) ([]byte, int) {
 
 	tmpBody.Bytes()
 
-	json.Unmarshal(req.Body, &newIngred)
+	// json.Unmarshal(req.Body, &newIngred)
 
 	return []byte{}, 0
 }

@@ -15,8 +15,8 @@ func NewServer(config config.Config, logger logg.Logger) *Server {
 	return &Server{Cfg: config, Logg: logger}
 }
 
-func (s *Server) Run() {
+func (s *Server) Run(router Router) {
 	s.Logg.RaiseFatal(
 		"Server is bad",
-		http.ListenAndServe(s.Cfg.GetRunAddress(), r.Router()))
+		http.ListenAndServe(s.Cfg.GetRunAddress(), router.Run()))
 }

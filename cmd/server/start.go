@@ -2,7 +2,9 @@ package server
 
 import (
 	"mealmate/cmd/config"
+	"mealmate/internal/handlers"
 	"mealmate/internal/logg"
+	"mealmate/internal/routes"
 	"mealmate/internal/store"
 )
 
@@ -13,10 +15,14 @@ func Start(
 	bsnessLog logg.Logger,
 	storeDB store.DataBase) {
 
-	// Router
-	router := NewRouter()
+	// Handlers
+	authHandler := handlers.NewAuthHandler(config, appLog)
+
+	// Routers
+	authRoutes := routes.NewAuthRoutes(authHandler)
+	router := NewRouter(authRoutes)
 
 	// Server
-	NewServer(config, appLog).Run()
+	NewServer(config, appLog).Run(router)
 
 }
