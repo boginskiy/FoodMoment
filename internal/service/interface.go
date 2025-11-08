@@ -14,9 +14,9 @@ type Servicer interface {
 }
 
 type ExFuncer interface {
-	GetFoodID(map[string]any, string) (string, error)
+	GetModelerID(map[string]any, string) (string, error)
 	ReadRequestBody(*http.Request) ([]byte, error)
 	TakeIDFromPath(*http.Request, string) (string, error)
 	TakeIDFromBody(*http.Request, string) (string, error)
-	NeedShow(m.Fooder, url.Values) bool
+	NeedShow(m.Modeler, url.Values) bool
 }

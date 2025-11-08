@@ -33,13 +33,13 @@ func (ex *ExtraFunc) queryParamsGoToLower(params url.Values) url.Values {
 	return params
 }
 
-func (ex *ExtraFunc) NeedShow(food m.Fooder, queryParams url.Values) bool {
+func (ex *ExtraFunc) NeedShow(modeler m.Modeler, queryParams url.Values) bool {
 	// Go to lower key for good compare continue ...
 	queryParams = ex.queryParamsGoToLower(queryParams)
 
-	// Get fields of struct of interface of Fooder
-	_value := reflect.ValueOf(food)
-	_type := reflect.TypeOf(food)
+	// Get fields of struct of interface of Modeler
+	_value := reflect.ValueOf(modeler)
+	_type := reflect.TypeOf(modeler)
 	numFields := _type.NumField()
 
 	var flagCheck uint8
@@ -106,8 +106,8 @@ func (ex *ExtraFunc) ReadRequestBody(req *http.Request) ([]byte, error) {
 	return body, nil
 }
 
-func (f *ExtraFunc) GetFoodID(deserializedFood map[string]any, id string) (string, error) {
-	value, ok := deserializedFood[id]
+func (f *ExtraFunc) GetModelerID(deserializedModeler map[string]any, id string) (string, error) {
+	value, ok := deserializedModeler[id]
 	if !ok {
 		return "", notIdFieldErr
 	}
@@ -135,14 +135,14 @@ func (ex *ExtraFunc) TakeIDFromBody(req *http.Request, id string) (string, error
 		return "", err
 	}
 
-	var foodForDelete map[string]any
-	err = ex.exEncoder.Deserialization(body, &foodForDelete)
+	var modelerForDelete map[string]any
+	err = ex.exEncoder.Deserialization(body, &modelerForDelete)
 	if err != nil {
 		return "", err
 	}
 
 	// Check that is ID, like 'Name'
-	value, err := ex.GetFoodID(foodForDelete, id)
+	value, err := ex.GetModelerID(modelerForDelete, id)
 	if err != nil {
 		return "", err
 	}

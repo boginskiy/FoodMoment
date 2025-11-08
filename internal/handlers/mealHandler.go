@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"fmt"
@@ -8,24 +8,24 @@ import (
 	"os"
 )
 
-type FoodHandler struct {
+type MealHandler struct {
 	servicer s.Servicer
 }
 
-func NewFoodHandler(s s.Servicer) *FoodHandler {
-	return &FoodHandler{servicer: s}
+func NewMealHandler(s s.Servicer) *MealHandler {
+	return &MealHandler{servicer: s}
 }
 
-func (f *FoodHandler) sendResponse(res http.ResponseWriter, body []byte, status int) {
+func (f *MealHandler) sendResponse(res http.ResponseWriter, body []byte, status int) {
 	res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(status)
 	_, err := res.Write(body)
 	if err != nil {
-		fmt.Fprintf(os.Stdout, "Problem in FoodHandler.sendResponse: %v\n", err)
+		fmt.Fprintf(os.Stdout, "Problem in MealHandler.sendResponse: %v\n", err)
 	}
 }
 
-func (f *FoodHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (f *MealHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	// Response
 	res.Header().Set("Content-Type", "text/plain")
 	res.WriteHeader(http.StatusNotFound)
@@ -35,22 +35,22 @@ func (f *FoodHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (f *FoodHandler) Create(res http.ResponseWriter, req *http.Request) {
+func (f *MealHandler) Create(res http.ResponseWriter, req *http.Request) {
 	body, status := f.servicer.Create(req)
 	f.sendResponse(res, body, status)
 }
 
-func (f *FoodHandler) Read(res http.ResponseWriter, req *http.Request) {
+func (f *MealHandler) Read(res http.ResponseWriter, req *http.Request) {
 	body, status := f.servicer.Read(req)
 	f.sendResponse(res, body, status)
 }
 
-func (f *FoodHandler) Update(res http.ResponseWriter, req *http.Request) {
+func (f *MealHandler) Update(res http.ResponseWriter, req *http.Request) {
 	body, status := f.servicer.Update(req)
 	f.sendResponse(res, body, status)
 }
 
-func (f *FoodHandler) Delete(res http.ResponseWriter, req *http.Request) {
+func (f *MealHandler) Delete(res http.ResponseWriter, req *http.Request) {
 	body, status := f.servicer.Delete(req)
 	f.sendResponse(res, body, status)
 }
