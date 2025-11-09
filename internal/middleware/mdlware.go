@@ -20,31 +20,43 @@ func NewMdlware(config config.Config, logger logg.Logger, auth auth.Author) *Mdl
 
 func (m *Mdlware) WithLogger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Сбор необходимой инфы
+		// Сбор необходимой инфы из Request
 		start := time.Now()
 		uri := r.RequestURI
 		method := r.Method
 
-		// Передача запроса далее
-		next.ServeHTTP(w, r)
+		// Подготовка расширенного Response
+		Exw := &ExResponseWriter{
+			ResponseWriter: w,
+			exData:         &ExData{},
+		}
 
-		// Запись лога
+		// Передача запроса далее
+		next.ServeHTTP(Exw, r)
+
+		// Запись лога по Request
 		m.Logg.RaiseInfo("Request:",
 			"uri", uri,
 			"method", method,
 			"duration", time.Since(start))
+
+		// Запись лога по Response
+		m.Logg.RaiseInfo("Response:",
+			"status", Exw.exData.status,
+			"size", Exw.exData.size)
 	})
 }
 
 func (m *Mdlware) WithAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Пропускаем urls, которые аворизуют/регистрируют
+
 		if m.Auth.CheckAuthURL(r) {
+			// Пропускаем urls, которые аворизуют/регистрируют
 			next.ServeHTTP(w, r)
+
+		} else {
+			// Проводим аутентификацию
 		}
 
-		//
-
-		// next.ServeHTTP(w, r)
 	})
 }

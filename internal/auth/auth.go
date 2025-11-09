@@ -1,11 +1,13 @@
 package auth
 
 import (
-	"fmt"
 	"mealmate/cmd/config"
 	"mealmate/internal/logg"
 	"net/http"
+	"strings"
 )
+
+var ALLOWED_PATHS = map[string]struct{}{"register": struct{}{}, "login": struct{}{}}
 
 type Auth struct {
 	Cfg  config.Config
@@ -24,6 +26,11 @@ func (a *Auth) Authentication() {
 }
 
 func (a *Auth) CheckAuthURL(req *http.Request) bool {
-	fmt.Println(req.URL)
-	return true
+	tmpURL := strings.Split(req.URL.String(), "/")
+	tmpPartOfURL := tmpURL[len(tmpURL)-1]
+
+	if _, ok := ALLOWED_PATHS[tmpPartOfURL]; ok {
+		return true
+	}
+	return false
 }
