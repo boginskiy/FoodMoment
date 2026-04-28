@@ -66,3 +66,10 @@
 {"lvl":"INFO","time":"2025-11-08T19:31:02+03:00","msg":"Mdlware: [uri /api/v1/auth/login method POST duration 37.11µs]"}
 {"lvl":"ERROR","time":"2025-11-08T19:31:56+03:00","msg":"Ignored key without a value.","ignored":["uri","/api/v1/auth/login","method","POST","duration",34032]}
 {"lvl":"INFO","time":"2025-11-08T19:31:56+03:00","msg":"Mdlware:"}
+{"lvl":"INFO","time":"2025-11-09T08:45:56+03:00","msg":"Request: [uri /api/v1/auth/login method POST duration 48.935µs]"}
+{"lvl":"INFO","time":"2025-11-09T08:48:32+03:00","msg":"Request: [uri /api/v1/auth/login method POST duration 40.967µs]"}
+{"lvl":"INFO","time":"2025-11-09T08:51:28+03:00","msg":"Request: [uri /api/v1/auth/login method POST duration 64.593µs]"}
+{"lvl":"INFO","time":"2025-11-09T08:52:07+03:00","msg":"Request: [uri /api/v1/auth/login/ method POST duration 17.185µs]"}
+{"lvl":"INFO","time":"2025-11-09T08:52:26+03:00","msg":"Request: [uri /api/v1/auth/login method POST duration 49.597µs]"}
+{"lvl":"INFO","time":"2025-11-09T09:28:57+03:00","msg":"Request: [uri /api/v1/auth/login method POST duration 21.684µs]"}
+{"lvl":"INFO","time":"2025-11-09T09:28:57+03:00","msg":"Response: [status 0 size 5]"}
