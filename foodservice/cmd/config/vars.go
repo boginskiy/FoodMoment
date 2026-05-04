@@ -1,7 +1,7 @@
 package config
 
 var (
-	nameOfVarPathCfgFileENV = "PATH_CONFIG"
-	nameOfVarPathCfgFileCLI = "path"
+	nameOfVarPathCfgFileENV = "path_config"
+	nameOfVarPathCfgFileCLI = "path_config"
 	defaultPathCfgFile      = "config.json"
 )

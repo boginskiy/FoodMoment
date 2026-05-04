@@ -1,6 +1,6 @@
 {
-    "Server_Host": "localhost",
-    "Server_Port": "8080",
-    "Postgres_Host": "localhost",
-    "Postgres_Port": "5034"
+    "server_host": "localhost",
+    "server_port": "8080",
+    "postgres_host": "localhost",
+    "postgres_port": "5034"
 }

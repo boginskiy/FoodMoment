@@ -4,16 +4,17 @@ import (
 	"context"
 
 	"github.com/boginskiy/FoodMoment/foodservice/cmd/config"
+	"github.com/boginskiy/FoodMoment/foodservice/internal/logg"
 	"github.com/boginskiy/FoodMoment/foodservice/pkg"
 )
 
 type App struct {
 	Config config.Config
+	Logger logg.Logger
 }
 
 func NewApp(ctx context.Context) (*App, error) {
 	tmpApp := &App{}
-
 	// Init modules.
 	err := tmpApp.initModules(ctx)
 	if err != nil {
@@ -22,9 +23,14 @@ func NewApp(ctx context.Context) (*App, error) {
 	return tmpApp, nil
 }
 
+func (a *App) Run(ctx context.Context) error {
+	return nil
+}
+
 func (a *App) initModules(ctx context.Context) error {
 	inits := []func(context.Context) error{
 		a.initConfig,
+		a.initLogger,
 	}
 
 	for _, init := range inits {
@@ -48,5 +54,10 @@ func (a *App) initConfig(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (a *App) initLogger(ctx context.Context) error {
+
 	return nil
 }
