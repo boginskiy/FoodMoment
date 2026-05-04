@@ -1,10 +1,6 @@
 {
-    "Server": {
-        "Host": "localhost",
-        "Port": "8080"
-    },
-    "DataBase": {
-        "Host": "localhost",
-        "Port": "5034"
-    }
+    "Server_Host": "localhost",
+    "Server_Port": "8080",
+    "Postgres_Host": "localhost",
+    "Postgres_Port": "5034"
 }

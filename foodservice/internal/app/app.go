@@ -8,7 +8,7 @@ import (
 )
 
 type App struct {
-	cfg *config.Config
+	Config config.Config
 }
 
 func NewApp(ctx context.Context) (*App, error) {
@@ -39,13 +39,12 @@ func (a *App) initModules(ctx context.Context) error {
 func (a *App) initConfig(ctx context.Context) error {
 	var err error
 
-	// GetterStringVar
-	getterStringVar := pkg.NewGetVar(ctx)
+	// Create providers
+	jsonProvider := config.NewJSONProvider(ctx, pkg.NewGetVar(ctx), pkg.NewReadFile(ctx))
+	cliProvider := config.NewCliProvider(ctx)
+	envProvider := config.NewEnvProvider(ctx)
 
-	// LoaderConfig
-	loaderConfig, _ := pkg.NewLoadConfig(ctx, getterStringVar)
-
-	a.cfg, err = config.NewConfig(ctx)
+	a.Config, err = config.NewConf(ctx, envProvider, cliProvider, jsonProvider)
 	if err != nil {
 		return err
 	}

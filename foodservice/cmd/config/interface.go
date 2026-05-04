@@ -1,16 +1,14 @@
 package config
 
-type ServerConfig interface {
+type ValueProvider interface {
+	Load(key string) (any, bool)
 }
 
-type DataBaseConfig interface {
+type ValuePriority interface {
+	Load(key string) any
 }
 
-type AuthConfig interface {
-}
-
-type RedisConfig interface {
-}
-
-type Loader interface {
+type Config interface {
+	GetString(key, defaultValue string) string
+	GetInt(key string, defaultValue int) int
 }

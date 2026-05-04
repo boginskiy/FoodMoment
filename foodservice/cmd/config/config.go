@@ -2,54 +2,47 @@ package config
 
 import (
 	"context"
-	"flag"
-	"os"
-
-	"github.com/boginskiy/FoodMoment/foodservice/pkg"
+	"strconv"
 )
 
-type Config struct {
-	Server   ServerConfig
-	DataBase DataBaseConfig
-	Auth     AuthConfig
-	Redis    RedisConfig
-
-	loader pkg.LoaderConfig
+type Conf struct {
+	provider ValuePriority
 }
 
-func NewConfig(ctx context.Context, loader pkg.LoaderConfig) (*Config, error) {
-	tmpCfg := &Config{}
-
-	// LoaderConfig.
-	loader, _ := pkg.NewLoadConfig(ctx, tmpCfg.getPathToConfigJSON())
-
-	err := tmpCfg.InitConfig(ctx)
-	if err != nil {
-		return nil, err
+func NewConf(ctx context.Context, envProvider, cliProvider, jsonProvider ValueProvider) (*Conf, error) {
+	providers := []ValueProvider{
+		envProvider,  // приоритет 1
+		cliProvider,  // приоритет 2
+		jsonProvider, // приоритет 3
 	}
 
-	return tmpCfg, nil
+	return &Conf{
+		provider: NewPriorityProvider(providers...),
+	}, nil
 }
 
-func (c *Config) InitConfig(ctx context.Context) error {
-	inits := []func(ctx context.Context) error{
-		c.InitServerConfig,
-	}
-
-	for _, init := range inits {
-		err := init(ctx)
-		if err != nil {
-			return err
+func (c *Conf) GetString(key, defaultValue string) string {
+	if val := c.provider.Load(key); val != nil {
+		if v, ok := val.(string); ok {
+			return v
 		}
 	}
-	return nil
+	return defaultValue
 }
 
-func (c *Config) InitServerConfig(ctx context.Context) error {
-	var err error
-	c.Server, err = NewServConfig(ctx)
-	if err != nil {
-		return err
+func (c *Conf) GetInt(key string, defaultValue int) int {
+	if val := c.provider.Load(key); val != nil {
+
+		switch v := val.(type) {
+		case int:
+			return v
+		case float64:
+			return int(v)
+		case string:
+			if i, err := strconv.Atoi(v); err == nil {
+				return i
+			}
+		}
 	}
-	return nil
+	return defaultValue
 }
