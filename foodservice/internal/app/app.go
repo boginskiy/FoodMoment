@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/boginskiy/FoodMoment/foodservice/cmd/config"
 	"github.com/boginskiy/FoodMoment/foodservice/internal/logg"
@@ -15,6 +16,7 @@ type App struct {
 
 func NewApp(ctx context.Context) (*App, error) {
 	tmpApp := &App{}
+
 	// Init modules.
 	err := tmpApp.initModules(ctx)
 	if err != nil {
@@ -28,13 +30,18 @@ func (a *App) Run(ctx context.Context) error {
 }
 
 func (a *App) initModules(ctx context.Context) error {
-	inits := []func(context.Context) error{
-		a.initConfig,
+	// Config
+	cfg, err := a.initConfig(ctx)
+	if err != nil {
+		return err
+	}
+
+	inits := []func(context.Context, config.Config) error{
 		a.initLogger,
 	}
 
 	for _, init := range inits {
-		err := init(ctx)
+		err := init(ctx, cfg)
 		if err != nil {
 			return err
 		}
@@ -42,22 +49,22 @@ func (a *App) initModules(ctx context.Context) error {
 	return nil
 }
 
-func (a *App) initConfig(ctx context.Context) error {
-	var err error
-
+func (a *App) initConfig(ctx context.Context) (*config.Conf, error) {
 	// Create providers
 	jsonProvider := config.NewJSONProvider(ctx, pkg.NewGetVar(ctx), pkg.NewReadFile(ctx))
 	cliProvider := config.NewCliProvider(ctx)
 	envProvider := config.NewEnvProvider(ctx)
 
-	a.Config, err = config.NewConf(ctx, envProvider, cliProvider, jsonProvider)
-	if err != nil {
-		return err
-	}
-	return nil
+	return config.NewConf(ctx, envProvider, cliProvider, jsonProvider)
 }
 
-func (a *App) initLogger(ctx context.Context) error {
+func (a *App) initLogger(ctx context.Context, cfg config.Config) error {
+	options := &slog.HandlerOptions{
+		Level: logg.Level[cfg.GetString("level_log", "INFO")],
+	}
+
+	outWrite, err := logg.NewOutWrite(cfg.GetString("path_log", "main.log"))
+	if err ... // TODO ...
 
 	return nil
 }

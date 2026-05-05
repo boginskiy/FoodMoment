@@ -1,0 +1,77 @@
+package main
+
+import (
+    "context"
+    "io"
+    "log/slog"
+    "os"
+)
+
+// Кастомный хендлер, который пишет в несколько мест
+type MultiHandler struct {
+    handlers []slog.Handler
+}
+
+func (h *MultiHandler) Enabled(ctx context.Context, level slog.Level) bool {
+    // Если хоть один хендлер активен
+    for _, handler := range h.handlers {
+        if handler.Enabled(ctx, level) {
+            return true
+        }
+    }
+    return false
+}
+
+func (h *MultiHandler) Handle(ctx context.Context, r slog.Record) error {
+    // Пишем во все хендлеры
+    for _, handler := range h.handlers {
+        if handler.Enabled(ctx, r.Level) {
+            if err := handler.Handle(ctx, r); err != nil {
+                return err
+            }
+        }
+    }
+    return nil
+}
+
+func (h *MultiHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+    newHandlers := make([]slog.Handler, len(h.handlers))
+    for i, handler := range h.handlers {
+        newHandlers[i] = handler.WithAttrs(attrs)
+    }
+    return &MultiHandler{handlers: newHandlers}
+}
+
+func (h *MultiHandler) WithGroup(name string) slog.Handler {
+    newHandlers := make([]slog.Handler, len(h.handlers))
+    for i, handler := range h.handlers {
+        newHandlers[i] = handler.WithGroup(name)
+    }
+    return &MultiHandler{handlers: newHandlers}
+}
+
+func main() {
+    // Создаем хендлер для файла (текстовый)
+    file, _ := os.Create("app.log")
+    fileHandler := slog.NewTextHandler(file, &slog.HandlerOptions{
+        Level: slog.LevelDebug,
+    })
+    
+    // Хендлер для stdout (JSON)
+    stdoutHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+        Level: slog.LevelInfo,
+    })
+    
+    // Объединяем
+    multiHandler := &MultiHandler{
+        handlers: []slog.Handler{fileHandler, stdoutHandler},
+    }
+    
+    logger := slog.New(multiHandler)
+    
+    // Этот лог попадет и в файл, и в stdout (JSON)
+    logger.Info("dual write test", "importance", "high")
+    
+    // Этот лог попадет только в файл (уровень DEBUG не проходит в stdout)
+    logger.Debug("debug only to file", "detail", "verbose info")
+}
