@@ -2,7 +2,7 @@ package config
 
 import (
 	"context"
-	"fmt"
+	"log"
 
 	"github.com/boginskiy/FoodMoment/foodservice/pkg"
 )
@@ -21,12 +21,12 @@ func NewJSONProvider(ctx context.Context, getter pkg.FlagEnvGetter, reader pkg.F
 	}
 
 	// Const variables.
-	path := tmpPr.choosePath(nameOfVarPathCfgFileCLI, nameOfVarPathCfgFileENV, defaultPathCfgFile)
+	path := tmpPr.choosePath(nameOfVarPathCfgFile, defaultPathCfgFile)
 
 	// Read config.json.
 	err := tmpPr.Reader.Deserialization(path, &tmpPr.data)
 	if err != nil {
-		fmt.Println(fmt.Errorf("failed to deserialize config.json from %s: %w", path, err))
+		log.Printf("failed to deserialize config.json: %s", err.Error())
 	}
 
 	return tmpPr
@@ -39,11 +39,11 @@ func (j *JSONProvider) Load(key string) (any, bool) {
 	return nil, false
 }
 
-func (j *JSONProvider) choosePath(flagKey, envKey, defaultVal string) string {
-	if path := j.Getter.GetValueFromENV(envKey); path != "" {
+func (j *JSONProvider) choosePath(key, defaultVal string) string {
+	if path := j.Getter.GetValueFromENV(key); path != "" {
 		return path
 	}
-	if path := j.Getter.GetValueFromCLI(flagKey); path != "" {
+	if path := j.Getter.GetValueFromCLI(key); path != "" {
 		return path
 	}
 	return defaultVal

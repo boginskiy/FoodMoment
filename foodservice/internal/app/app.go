@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/boginskiy/FoodMoment/foodservice/cmd/config"
 	"github.com/boginskiy/FoodMoment/foodservice/internal/logg"
@@ -10,8 +9,9 @@ import (
 )
 
 type App struct {
-	Config config.Config
-	Logger logg.Logger
+	Config   config.Config
+	MainLog  logg.Logger
+	InfraLog logg.Logger
 }
 
 func NewApp(ctx context.Context) (*App, error) {
@@ -29,6 +29,15 @@ func (a *App) Run(ctx context.Context) error {
 	return nil
 }
 
+func (a *App) initConfig(ctx context.Context) (*config.Conf, error) {
+	// Create providers
+	jsonProvider := config.NewJSONProvider(ctx, pkg.NewGetVar(ctx), pkg.NewReadFile(ctx))
+	cliProvider := config.NewCliProvider(ctx)
+	envProvider := config.NewEnvProvider(ctx)
+
+	return config.NewConf(ctx, envProvider, cliProvider, jsonProvider)
+}
+
 func (a *App) initModules(ctx context.Context) error {
 	// Config
 	cfg, err := a.initConfig(ctx)
@@ -37,7 +46,8 @@ func (a *App) initModules(ctx context.Context) error {
 	}
 
 	inits := []func(context.Context, config.Config) error{
-		a.initLogger,
+		a.initMainLogger,
+		a.initInfraLogger,
 	}
 
 	for _, init := range inits {
@@ -49,22 +59,35 @@ func (a *App) initModules(ctx context.Context) error {
 	return nil
 }
 
-func (a *App) initConfig(ctx context.Context) (*config.Conf, error) {
-	// Create providers
-	jsonProvider := config.NewJSONProvider(ctx, pkg.NewGetVar(ctx), pkg.NewReadFile(ctx))
-	cliProvider := config.NewCliProvider(ctx)
-	envProvider := config.NewEnvProvider(ctx)
+func (a *App) initMainLogger(ctx context.Context, cfg config.Config) error {
+	path := cfg.GetString("path_log", config.MainLog)
+	level := cfg.GetString("level_log", config.LevelInfo)
 
-	return config.NewConf(ctx, envProvider, cliProvider, jsonProvider)
-}
+	var err error
 
-func (a *App) initLogger(ctx context.Context, cfg config.Config) error {
-	options := &slog.HandlerOptions{
-		Level: logg.Level[cfg.GetString("level_log", "INFO")],
+	a.MainLog, err = logg.NewLogg(path, level, logg.JSONHandler)
+	if err != nil {
+		return err
 	}
-
-	outWrite, err := logg.NewOutWrite(cfg.GetString("path_log", "main.log"))
-	if err ... // TODO ...
-
 	return nil
 }
+
+func (a *App) initInfraLogger(ctx context.Context, cfg config.Config) error {
+	path := ""
+	level := "DEBUG"
+
+	var err error
+
+	a.InfraLog, err = logg.NewLogg(path, level, logg.TextHandler)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// TODO.
+// Логгер, далее методы, кафку продумать, откидываем ошибки уровня error
+
+// Далее сервер делать
+// Роутер
+// и т.п.

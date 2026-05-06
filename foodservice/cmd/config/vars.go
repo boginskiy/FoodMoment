@@ -1,7 +1,10 @@
 package config
 
 var (
-	nameOfVarPathCfgFileENV = "path_config"
-	nameOfVarPathCfgFileCLI = "path_config"
-	defaultPathCfgFile      = "config.json"
+	nameOfVarPathCfgFile = "path_config"
+	defaultPathCfgFile   = "config.json"
+
+	// Default value
+	LevelInfo = "INFO"
+	MainLog   = "main.log"
 )
