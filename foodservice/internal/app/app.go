@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/boginskiy/FoodMoment/foodservice/cmd/config"
 	"github.com/boginskiy/FoodMoment/foodservice/internal/logg"
@@ -10,8 +11,8 @@ import (
 
 type App struct {
 	Config   config.Config
-	MainLog  logg.Logger
-	InfraLog logg.Logger
+	MainLog  *slog.Logger
+	InfraLog *slog.Logger
 }
 
 func NewApp(ctx context.Context) (*App, error) {
@@ -61,11 +62,12 @@ func (a *App) initModules(ctx context.Context) error {
 
 func (a *App) initMainLogger(ctx context.Context, cfg config.Config) error {
 	path := cfg.GetString("path_log", config.MainLog)
-	level := cfg.GetString("level_log", config.LevelInfo)
+	levelF := cfg.GetString("level_file_log", config.LevelWarn)
+	levelK := cfg.GetString("level_kafka_log", config.LevelInfo)
 
 	var err error
 
-	a.MainLog, err = logg.NewLogg(path, level, logg.JSONHandler)
+	a.MainLog, err = logg.NewLogg(ctx, path, levelF, levelK, logg.JSONHandler)
 	if err != nil {
 		return err
 	}
@@ -74,11 +76,12 @@ func (a *App) initMainLogger(ctx context.Context, cfg config.Config) error {
 
 func (a *App) initInfraLogger(ctx context.Context, cfg config.Config) error {
 	path := ""
-	level := "DEBUG"
+	levelF := "DEBUG"
+	levelK := "INFO"
 
 	var err error
 
-	a.InfraLog, err = logg.NewLogg(path, level, logg.TextHandler)
+	a.InfraLog, err = logg.NewLogg(ctx, path, levelF, levelK, logg.TextHandler)
 	if err != nil {
 		return err
 	}

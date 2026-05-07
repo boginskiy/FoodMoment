@@ -6,5 +6,6 @@ var (
 
 	// Default value
 	LevelInfo = "INFO"
+	LevelWarn = "WARN"
 	MainLog   = "main.log"
 )

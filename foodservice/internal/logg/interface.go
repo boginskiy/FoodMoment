@@ -1,4 +1,7 @@
 package logg
 
-type Logger interface {
+import "log/slog"
+
+type LoggerKafka interface {
+	Send(slog.Record)
 }
