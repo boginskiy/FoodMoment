@@ -3,5 +3,14 @@
     "server_port": "8080",
     "postgres_host": "localhost",
     "postgres_port": "5034",
-    "path_log": "logs/main.log"
+    
+    "path_main_log": "logs/main.log",
+    "path_infra_log": "logs/infra.log",
+    "level_main_log": "ERROR",
+    "level_infra_log": "INFO",
+    "addsource_main_log": true,
+    "addsource_infra_log": false,
+    "kafka_enabled_log": true,
+    "kafka_level_log": "INFO"
+
 }

@@ -10,16 +10,16 @@ import (
 )
 
 type App struct {
-	Config   config.Config
-	MainLog  *slog.Logger
-	InfraLog *slog.Logger
+	Config  config.Config
+	Logger  logg.Logger
+	SLogger *slog.Logger
 }
 
 func NewApp(ctx context.Context) (*App, error) {
 	tmpApp := &App{}
 
 	// Init modules.
-	err := tmpApp.initModules(ctx)
+	err := tmpApp.InitModules(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -30,29 +30,15 @@ func (a *App) Run(ctx context.Context) error {
 	return nil
 }
 
-func (a *App) initConfig(ctx context.Context) (*config.Conf, error) {
-	// Create providers
-	jsonProvider := config.NewJSONProvider(ctx, pkg.NewGetVar(ctx), pkg.NewReadFile(ctx))
-	cliProvider := config.NewCliProvider(ctx)
-	envProvider := config.NewEnvProvider(ctx)
-
-	return config.NewConf(ctx, envProvider, cliProvider, jsonProvider)
-}
-
-func (a *App) initModules(ctx context.Context) error {
-	// Config
-	cfg, err := a.initConfig(ctx)
-	if err != nil {
-		return err
-	}
-
-	inits := []func(context.Context, config.Config) error{
-		a.initMainLogger,
-		a.initInfraLogger,
+func (a *App) InitModules(ctx context.Context) error {
+	inits := []func(context.Context) error{
+		a.initConfig,
+		a.initLogger,
+		a.initSLogger,
 	}
 
 	for _, init := range inits {
-		err := init(ctx, cfg)
+		err := init(ctx)
 		if err != nil {
 			return err
 		}
@@ -60,28 +46,48 @@ func (a *App) initModules(ctx context.Context) error {
 	return nil
 }
 
-func (a *App) initMainLogger(ctx context.Context, cfg config.Config) error {
-	path := cfg.GetString("path_log", config.MainLog)
-	levelF := cfg.GetString("level_file_log", config.LevelWarn)
-	levelK := cfg.GetString("level_kafka_log", config.LevelInfo)
-
+func (a *App) initLogger(ctx context.Context) error {
+	config := logg.Config{
+		Path:      a.Config.GetString("path_main_log", "main.log"),
+		Level:     a.Config.GetString("level_main_log", "INFO"),
+		AddSource: a.Config.GetBool("addsource_main_log", true),
+	}
 	var err error
-
-	a.MainLog, err = logg.NewLogg(ctx, path, levelF, levelK, logg.JSONHandler)
+	a.Logger, err = logg.NewLogg(config, logg.JSONHandler)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (a *App) initInfraLogger(ctx context.Context, cfg config.Config) error {
-	path := ""
-	levelF := "DEBUG"
-	levelK := "INFO"
+func (a *App) initConfig(ctx context.Context) error {
+	// Create providers
+	jsonProvider := config.NewJSONProvider(ctx, pkg.NewGetVar(ctx), pkg.NewReadFile(ctx))
+	cliProvider := config.NewCliProvider(ctx)
+	envProvider := config.NewEnvProvider(ctx)
 
 	var err error
+	a.Config, err = config.NewConf(ctx, envProvider, cliProvider, jsonProvider)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
-	a.InfraLog, err = logg.NewLogg(ctx, path, levelF, levelK, logg.TextHandler)
+func (a *App) initSLogger(ctx context.Context) error {
+	config := logg.Config{
+		Path:         a.Config.GetString("path_infra_log", "infra.log"),
+		Level:        a.Config.GetString("level_infra_log", "INFO"),
+		AddSource:    a.Config.GetBool("addsource_infra_log", false),
+		KafkaEnabled: a.Config.GetBool("kafka_enabled_log", true),
+		KafkaLevel:   a.Config.GetString("kafka_level_log", "INFO"),
+	}
+
+	// Producer by Kafka.
+	produceLogger := logg.NewProduceLogg(ctx, a.Logger, CapQueue)
+
+	var err error
+	a.SLogger, err = logg.NewSLogg(config, logg.JSONHandler, produceLogger)
 	if err != nil {
 		return err
 	}
@@ -90,7 +96,6 @@ func (a *App) initInfraLogger(ctx context.Context, cfg config.Config) error {
 
 // TODO.
 // Логгер, далее методы, кафку продумать, откидываем ошибки уровня error
-
 // Далее сервер делать
 // Роутер
 // и т.п.

@@ -46,3 +46,12 @@ func (c *Conf) GetInt(key string, defaultValue int) int {
 	}
 	return defaultValue
 }
+
+func (c *Conf) GetBool(key string, defaultValue bool) bool {
+	if val := c.provider.Load(key); val != nil {
+		if v, ok := val.(bool); ok {
+			return v
+		}
+	}
+	return defaultValue
+}

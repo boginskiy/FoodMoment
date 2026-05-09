@@ -10,5 +10,6 @@ type ValuePriority interface {
 
 type Config interface {
 	GetString(key, defaultValue string) string
+	GetBool(key string, defaultValue bool) bool
 	GetInt(key string, defaultValue int) int
 }
