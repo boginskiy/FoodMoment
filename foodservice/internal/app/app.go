@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/boginskiy/FoodMoment/foodservice/cmd/config"
 	"github.com/boginskiy/FoodMoment/foodservice/internal/logg"
@@ -10,9 +9,10 @@ import (
 )
 
 type App struct {
-	Config  config.Config
-	Logger  logg.Logger
-	SLogger *slog.Logger
+	Config      config.Config
+	Logger      logg.Logger
+	KafkaLogger logg.Logger
+	SLogger     logg.Logger
 }
 
 func NewApp(ctx context.Context) (*App, error) {
@@ -34,6 +34,7 @@ func (a *App) InitModules(ctx context.Context) error {
 	inits := []func(context.Context) error{
 		a.initConfig,
 		a.initLogger,
+		a.initKafkaLogger,
 		a.initSLogger,
 	}
 
@@ -42,20 +43,6 @@ func (a *App) InitModules(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-	}
-	return nil
-}
-
-func (a *App) initLogger(ctx context.Context) error {
-	config := logg.Config{
-		Path:      a.Config.GetString("path_main_log", "main.log"),
-		Level:     a.Config.GetString("level_main_log", "INFO"),
-		AddSource: a.Config.GetBool("addsource_main_log", true),
-	}
-	var err error
-	a.Logger, err = logg.NewLogg(config, logg.JSONHandler)
-	if err != nil {
-		return err
 	}
 	return nil
 }
@@ -74,24 +61,69 @@ func (a *App) initConfig(ctx context.Context) error {
 	return nil
 }
 
-func (a *App) initSLogger(ctx context.Context) error {
-	config := logg.Config{
-		Path:         a.Config.GetString("path_infra_log", "infra.log"),
-		Level:        a.Config.GetString("level_infra_log", "INFO"),
-		AddSource:    a.Config.GetBool("addsource_infra_log", false),
-		KafkaEnabled: a.Config.GetBool("kafka_enabled_log", true),
-		KafkaLevel:   a.Config.GetString("kafka_level_log", "INFO"),
+func (a *App) initLogger(ctx context.Context) (err error) {
+	// Config
+	cfg := logg.Config{
+		Path:      a.Config.GetString("path_main_log", logg.MainLogCfg.Path),
+		Level:     a.Config.GetString("level_main_log", logg.MainLogCfg.Level),
+		AddSource: a.Config.GetBool("addsource_main_log", logg.MainLogCfg.AddSource),
 	}
 
-	// Producer by Kafka.
-	produceLogger := logg.NewProduceLogg(ctx, a.Logger, CapQueue)
-
-	var err error
-	a.SLogger, err = logg.NewSLogg(config, logg.JSONHandler, produceLogger)
+	a.Logger, err = logg.NewLogg(cfg, logg.JSONHandler)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (a *App) initKafkaLogger(ctx context.Context) (err error) {
+	// Config
+	cfg := logg.Config{
+		Path:      a.Config.GetString("path_kafka_log", logg.KafkaLogCfg.Path),
+		Level:     a.Config.GetString("level_kafka_log", logg.KafkaLogCfg.Level),
+		AddSource: a.Config.GetBool("addsource_kafka_log", logg.KafkaLogCfg.AddSource),
+	}
+
+	a.KafkaLogger, err = logg.NewLogg(cfg, logg.JSONHandler)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *App) initSLogger(ctx context.Context) error {
+	// Config
+	cfg := logg.Config{
+		Path:         a.Config.GetString("path_metrics_log", logg.MetricsLogCfg.Path),
+		Level:        a.Config.GetString("level_metrics_log", logg.MetricsLogCfg.Level),
+		AddSource:    a.Config.GetBool("addsource_metrics_log", logg.MetricsLogCfg.AddSource),
+		KafkaEnabled: a.Config.GetBool("enabled_kafkalog", logg.MetricsLogCfg.KafkaEnabled),
+	}
+
+	// Sender
+	sender, err := a.newKafkaSender(ctx, a.KafkaLogger)
+	if err != nil {
+		return err
+	}
+
+	a.SLogger, err = logg.NewKafkaLogger(cfg, logg.JSONHandler, sender)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *App) newKafkaSender(ctx context.Context, log logg.Logger) (*logg.KafkaSend, error) {
+	// Kafka config
+	kcfg := logg.KafkaConfig{
+		Servers:     a.Config.GetString("servers_kafka_log", logg.KafkaCfg.Servers),
+		ClientID:    a.Config.GetString("clientID_kafka_log", logg.KafkaCfg.ClientID),
+		Acks:        a.Config.GetString("acks_kafka_log", logg.KafkaCfg.Acks),
+		ChannelSize: a.Config.GetInt("channelsize_kafka_log", logg.KafkaCfg.ChannelSize),
+		MaxMessages: a.Config.GetInt("maxmessages_kafka_log", logg.KafkaCfg.MaxMessages),
+	}
+	// Sender in Kafka.
+	return logg.NewKafkaSend(ctx, kcfg, log)
 }
 
 // TODO.

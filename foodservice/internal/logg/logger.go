@@ -47,7 +47,7 @@ func (l *Logg) Close() error {
 	return nil
 }
 
-func (l *Logg) With(args ...any) *Logg {
+func (l *Logg) With(args ...any) Logger {
 	return &Logg{
 		Logger: l.Logger.With(args...),
 		closer: l.closer,

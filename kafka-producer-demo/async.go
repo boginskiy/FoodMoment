@@ -11,12 +11,11 @@ import (
 
 func main() {
 	config := &kafka.ConfigMap{
-		"bootstrap.servers": "localhost:9092",
-		"client.id":         "async-producer",
-		"acks":              "all",
-		// Оптимизация производительности [citation:9]
-		"go.produce.channel.size":      100000, // Что это ?
-		"queue.buffering.max.messages": 100000, // Что это ?
+		"bootstrap.servers":            "kafka1:9092,kafka2:9092,kafka3:9092", // Минимум 2-3 брокера для отказоустойчивости
+		"client.id":                    "LoggerWriter",                        // Логическое имя продюсера, которое отправляется в каждом запросе к брокерам
+		"acks":                         "1",                                   // Компромисс. Только лидер партиции подтверждает получение данных. Реплики могут не успеть получить данные
+		"go.produce.channel.size":      1000,                                  // Оптимизация производительности
+		"queue.buffering.max.messages": 1000,                                  // Оптимизация производительности
 	}
 
 	//

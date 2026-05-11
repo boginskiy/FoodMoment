@@ -5,12 +5,21 @@
     "postgres_port": "5034",
     
     "path_main_log": "logs/main.log",
-    "path_infra_log": "logs/infra.log",
     "level_main_log": "ERROR",
-    "level_infra_log": "INFO",
     "addsource_main_log": true,
-    "addsource_infra_log": false,
-    "kafka_enabled_log": true,
-    "kafka_level_log": "INFO"
 
+    "path_kafka_log": "logs/kafka.log",
+    "level_kafka_log": "INFO",
+    "addsource_kafka_log": false,
+
+    "path_metrics_log": "logs/metrics.log",
+    "level_metrics_log": "INFO",
+    "addsource_metrics_log": false,
+    "enabled_kafkalog": true,
+  
+    "servers_kafka_log": "kafka1:9092,kafka2:9092,kafka3:9092",
+    "clientID_kafka_log": "LoggerWriter",
+    "acks_kafka_log": "1",
+    "channelsize_kafka_log": 1000,
+    "maxmessages_kafka_log": 1000
 }

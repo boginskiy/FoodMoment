@@ -50,7 +50,7 @@ func main() {
 	if msg.TopicPartition.Error != nil {
 		fmt.Printf("Delivery failed: %v\n", msg.TopicPartition.Error)
 	} else {
-		fmt.Printf("%s - [%d] at offset %v\n",
+		fmt.Printf("Topic:%s, Partition: [%d], Offset: %v\n",
 			*msg.TopicPartition.Topic,
 			msg.TopicPartition.Partition,
 			msg.TopicPartition.Offset)
@@ -58,9 +58,3 @@ func main() {
 
 	close(deliveryChan)
 }
-
-//
-// [Running] go run "/home/ali/dev/FoodMoment/kafka-producer-demo/main.go"
-// %3|1778365131.250|FAIL|my-producer#producer-1| [thrd:localhost:9092/bootstrap]: localhost:9092/bootstrap: Connect to ipv4#127.0.0.1:9092 failed: Connection refused (after 0ms in state CONNECT)
-// %3|1778365132.250|FAIL|my-producer#producer-1| [thrd:localhost:9092/bootstrap]: localhost:9092/bootstrap: Connect to ipv4#127.0.0.1:9092 failed: Connection refused (after 0ms in state CONNECT, 1 identical error(s) suppressed)
-// %3|1778365162.251|FAIL|my-producer#producer-1| [thrd:localhost:9092/bootstrap]: localhost:9092/bootstrap: Connect to ipv4#127.0.0.1:9092 failed: Connection refused (after 0ms in state CONNECT, 30 identical error(s) suppressed)

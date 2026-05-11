@@ -7,7 +7,12 @@ import (
 	"os"
 )
 
-func NewSLogg(cfg Config, factory HandlerFactory, producer ProducLogger) (*slog.Logger, error) {
+type KafkaLogg struct {
+	slog   *slog.Logger
+	closer io.Closer
+}
+
+func NewKafkaLogger(cfg Config, factory HandlerFactory, sender KafkaSender) (*KafkaLogg, error) {
 	var writer io.Writer = os.Stderr
 	var closer io.Closer
 
@@ -27,46 +32,51 @@ func NewSLogg(cfg Config, factory HandlerFactory, producer ProducLogger) (*slog.
 		AddSource: cfg.AddSource,
 	}
 
-	// Базовый логгер. Без поддержки Kafka.
-	handler := factory(writer, opt)
-	finalHandler := handler
-
-	// Расширенный логгер. С поддержкой Kafka.
-	if producer != nil && cfg.KafkaEnabled {
-		finalHandler = &KafkaHandler{
-			Producer:    producer,
-			Config:      cfg,
+	handler := factory(writer, opt)        // Базовый логгер. Без поддержки Kafka.
+	if sender != nil && cfg.KafkaEnabled { // Расширенный логгер. С поддержкой Kafka.
+		handler = &KafkaHandler{
+			Sender:      sender,
 			baseHandler: handler,
-			closer:      closer,
 		}
 	}
 
-	return slog.New(finalHandler), nil
+	return &KafkaLogg{slog: slog.New(handler), closer: closer}, nil
 }
 
+func (k *KafkaLogg) Close() error {
+	if k.closer != nil {
+		return k.closer.Close()
+	}
+	return nil
+}
+
+func (k *KafkaLogg) With(args ...any) Logger {
+	return &KafkaLogg{
+		slog:   k.slog.With(args...),
+		closer: k.closer,
+	}
+}
+
+func (k *KafkaLogg) Info(msg string, args ...any) {
+	k.slog.Info(msg, args...)
+}
+
+func (k *KafkaLogg) Error(msg string, args ...any) {
+	k.slog.Error(msg, args...)
+}
+
+// KafkaHandler
 type KafkaHandler struct {
-	Producer    ProducLogger
-	Config      Config
+	Sender      KafkaSender
 	baseHandler slog.Handler
-	closer      io.Closer
 }
 
 func (k *KafkaHandler) Handle(ctx context.Context, r slog.Record) error {
-	// Отправка логов в Kafka с учетом заданного уровня.
-	if k.Producer != nil && r.Level == Level[k.Config.KafkaLevel] {
+	// Отправка логов в Kafka.
+	if k.Sender != nil {
 		go func() {
 			// TODO. Использование отдельного контекста?
-			k.Producer.Send(ctx, r)
-
-			// if err != nil {
-			// 	// Логируем ошибку в основной логгер.
-			// 	k.baseHandler.Handle(ctx, slog.NewRecord(
-			// 		r.Time,
-			// 		slog.LevelWarn,
-			// 		"failed to send log to Kafka",
-			// 		0,
-			// 	))
-			// }
+			k.Sender.Send(ctx, r)
 		}()
 	}
 
@@ -84,17 +94,13 @@ func (k *KafkaHandler) Enabled(ctx context.Context, level slog.Level) bool {
 func (k *KafkaHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &KafkaHandler{
 		baseHandler: k.baseHandler.WithAttrs(attrs),
-		Producer:    k.Producer,
-		Config:      k.Config,
-		closer:      k.closer,
+		Sender:      k.Sender,
 	}
 }
 
 func (k *KafkaHandler) WithGroup(name string) slog.Handler {
 	return &KafkaHandler{
 		baseHandler: k.baseHandler.WithGroup(name),
-		Producer:    k.Producer,
-		Config:      k.Config,
-		closer:      k.closer,
+		Sender:      k.Sender,
 	}
 }

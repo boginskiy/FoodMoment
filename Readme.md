@@ -78,3 +78,11 @@ docker-compose logs kafka
 
 # Остановка
 docker-compose down
+
+
+### Создание топиков
+# Удалите старый топик
+sudo docker exec -it foodmoment-kafka-1 kafka-topics --delete --topic my-topic --bootstrap-server localhost:9092
+
+# Создайте новый с нужным числом партиций, например, с 3
+sudo docker exec -it foodmoment-kafka-1 kafka-topics --create --topic my-topic --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
