@@ -1,10 +1,12 @@
-package logg
+package kafkalogg
 
 import (
 	"context"
 	"io"
 	"log/slog"
 	"os"
+
+	"github.com/boginskiy/FoodMoment/foodservice/internal/logg"
 )
 
 type KafkaLogg struct {
@@ -12,7 +14,7 @@ type KafkaLogg struct {
 	closer io.Closer
 }
 
-func NewKafkaLogger(cfg Config, factory HandlerFactory, sender KafkaSender) (*KafkaLogg, error) {
+func NewKafkaLogger(cfg logg.Config, factory logg.HandlerFactory, sender Sender) (*KafkaLogg, error) {
 	var writer io.Writer = os.Stderr
 	var closer io.Closer
 
@@ -28,7 +30,7 @@ func NewKafkaLogger(cfg Config, factory HandlerFactory, sender KafkaSender) (*Ka
 
 	// Options
 	opt := &slog.HandlerOptions{
-		Level:     Level[cfg.Level],
+		Level:     logg.Level[cfg.Level],
 		AddSource: cfg.AddSource,
 	}
 
@@ -50,7 +52,7 @@ func (k *KafkaLogg) Close() error {
 	return nil
 }
 
-func (k *KafkaLogg) With(args ...any) Logger {
+func (k *KafkaLogg) With(args ...any) logg.Logger {
 	return &KafkaLogg{
 		slog:   k.slog.With(args...),
 		closer: k.closer,
@@ -67,7 +69,7 @@ func (k *KafkaLogg) Error(msg string, args ...any) {
 
 // KafkaHandler
 type KafkaHandler struct {
-	Sender      KafkaSender
+	Sender      Sender
 	baseHandler slog.Handler
 }
 

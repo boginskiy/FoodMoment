@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/boginskiy/FoodMoment/foodservice/cmd/config"
+	"github.com/boginskiy/FoodMoment/foodservice/internal/kafkalogg"
 	"github.com/boginskiy/FoodMoment/foodservice/internal/logg"
 	"github.com/boginskiy/FoodMoment/foodservice/pkg"
 )
@@ -12,6 +13,7 @@ type App struct {
 	Config      config.Config
 	Logger      logg.Logger
 	KafkaLogger logg.Logger
+	KafkaSender kafkalogg.Sender
 	SLogger     logg.Logger
 }
 
@@ -30,12 +32,22 @@ func (a *App) Run(ctx context.Context) error {
 	return nil
 }
 
+func (a *App) Close() error {
+	a.KafkaLogger.Close()
+	a.KafkaSender.Close()
+	a.SLogger.Close()
+	a.SLogger.Close()
+	a.Logger.Close()
+	return nil
+}
+
 func (a *App) InitModules(ctx context.Context) error {
 	inits := []func(context.Context) error{
-		a.initConfig,
-		a.initLogger,
-		a.initKafkaLogger,
-		a.initSLogger,
+		a.initConfig,      // Config главный
+		a.initLogger,      // Logger главный
+		a.initKafkaLogger, // Logger, который контролирует работу брокера
+		a.initKafkaSender, // Sender отправщик данных в kafka
+		a.initSLogger,     // Logger для сборка статистики и отправка в брокер
 	}
 
 	for _, init := range inits {
@@ -91,7 +103,25 @@ func (a *App) initKafkaLogger(ctx context.Context) (err error) {
 	return nil
 }
 
-func (a *App) initSLogger(ctx context.Context) error {
+func (a *App) initKafkaSender(ctx context.Context) (err error) {
+	// Kafka config
+	kcfg := kafkalogg.Config{
+		Servers:     a.Config.GetString("servers_kafka_log", kafkalogg.Cfg.Servers),
+		ClientID:    a.Config.GetString("clientID_kafka_log", kafkalogg.Cfg.ClientID),
+		Acks:        a.Config.GetString("acks_kafka_log", kafkalogg.Cfg.Acks),
+		Topic:       a.Config.GetString("topic_kafka_log", kafkalogg.Cfg.Topic), // Нет в config.json
+		ChannelSize: a.Config.GetInt("channelsize_kafka_log", kafkalogg.Cfg.ChannelSize),
+		MaxMessages: a.Config.GetInt("maxmessages_kafka_log", kafkalogg.Cfg.MaxMessages),
+	}
+	// Sender in Kafka.
+	a.KafkaSender, err = kafkalogg.NewKafkaSend(ctx, kcfg, a.KafkaLogger)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *App) initSLogger(ctx context.Context) (err error) {
 	// Config
 	cfg := logg.Config{
 		Path:         a.Config.GetString("path_metrics_log", logg.MetricsLogCfg.Path),
@@ -100,34 +130,18 @@ func (a *App) initSLogger(ctx context.Context) error {
 		KafkaEnabled: a.Config.GetBool("enabled_kafkalog", logg.MetricsLogCfg.KafkaEnabled),
 	}
 
-	// Sender
-	sender, err := a.newKafkaSender(ctx, a.KafkaLogger)
-	if err != nil {
-		return err
-	}
-
-	a.SLogger, err = logg.NewKafkaLogger(cfg, logg.JSONHandler, sender)
+	a.SLogger, err = kafkalogg.NewKafkaLogger(cfg, logg.JSONHandler, a.KafkaSender)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (a *App) newKafkaSender(ctx context.Context, log logg.Logger) (*logg.KafkaSend, error) {
-	// Kafka config
-	kcfg := logg.KafkaConfig{
-		Servers:     a.Config.GetString("servers_kafka_log", logg.KafkaCfg.Servers),
-		ClientID:    a.Config.GetString("clientID_kafka_log", logg.KafkaCfg.ClientID),
-		Acks:        a.Config.GetString("acks_kafka_log", logg.KafkaCfg.Acks),
-		ChannelSize: a.Config.GetInt("channelsize_kafka_log", logg.KafkaCfg.ChannelSize),
-		MaxMessages: a.Config.GetInt("maxmessages_kafka_log", logg.KafkaCfg.MaxMessages),
-	}
-	// Sender in Kafka.
-	return logg.NewKafkaSend(ctx, kcfg, log)
-}
-
 // TODO.
-// Логгер, далее методы, кафку продумать, откидываем ошибки уровня error
+// Сделать минимальный функционал в этом сервисе и делать аутентификацию пользователя.
+// Далеее сделать consumer для приемки метрик-логов черещ брокера
+
+// TODO...
 // Далее сервер делать
 // Роутер
 // и т.п.

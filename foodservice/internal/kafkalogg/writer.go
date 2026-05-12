@@ -1,20 +1,20 @@
-package logg
+package kafkalogg
 
 import (
 	"context"
 	"errors"
 	"time"
 
+	"github.com/boginskiy/FoodMoment/foodservice/internal/logg"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/docker/docker/daemon/logger"
 )
 
 type KafkaWrite struct {
 	producer *kafka.Producer
-	Logger   Logger
+	Logger   logg.Logger
 }
 
-func NewKafkaWrite(ctx context.Context, cfg KafkaConfig, log logger.Logger) (*KafkaWrite, error) {
+func NewKafkaWrite(ctx context.Context, cfg Config, log logg.Logger) (*KafkaWrite, error) {
 	// Config
 	config := &kafka.ConfigMap{
 		"bootstrap.servers":            cfg.Servers,
@@ -52,11 +52,8 @@ func (k *KafkaWrite) Send(topic string, msg []byte) {
 }
 
 func (k *KafkaWrite) doFlush(ctx context.Context) {
-	select {
-	case <-ctx.Done():
-		// Flush 3 sec
-		k.producer.Flush(workingTimeAfterDone * 1000)
-	}
+	<-ctx.Done()
+	k.producer.Flush(workingTimeAfterDone * 1000)
 }
 
 func (k *KafkaWrite) procResponse(ctx context.Context) {
@@ -106,7 +103,7 @@ func (k *KafkaWrite) workingDoneWithTime(sec int) {
 				continue
 			}
 
-		case <-time.After(time.Duration(3) * time.Second):
+		case <-time.After(time.Duration(sec) * time.Second):
 			return
 		}
 	}

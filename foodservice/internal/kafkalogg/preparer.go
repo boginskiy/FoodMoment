@@ -1,4 +1,4 @@
-package logg
+package kafkalogg
 
 import (
 	"encoding/json"
