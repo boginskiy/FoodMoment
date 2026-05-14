@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"strconv"
+	"time"
 )
 
 type Conf struct {
@@ -51,6 +52,15 @@ func (c *Conf) GetBool(key string, defaultValue bool) bool {
 	if val := c.provider.Load(key); val != nil {
 		if v, ok := val.(bool); ok {
 			return v
+		}
+	}
+	return defaultValue
+}
+
+func (c *Conf) GetDuration(key string, defaultValue time.Duration) time.Duration {
+	if val := c.provider.Load(key); val != nil {
+		if v, ok := val.(int); ok {
+			return time.Duration(v) * time.Second
 		}
 	}
 	return defaultValue

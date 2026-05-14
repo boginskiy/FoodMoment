@@ -1,6 +1,10 @@
 {
     "server_host": "localhost",
     "server_port": "8080",
+    "read_timeout":  5,
+    "write_timeout": 10,
+    "idle_timeout":  120,
+
     "postgres_host": "localhost",
     "postgres_port": "5034",
     
